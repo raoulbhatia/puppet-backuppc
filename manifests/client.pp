@@ -226,6 +226,7 @@
 #
 class backuppc::client (
   $ensure                = 'present',
+  $config_name           = $::fqdn,
   $backuppc_hostname     = '',
   $client_name_alias     = false,
   $system_account        = 'backup',
@@ -287,6 +288,7 @@ class backuppc::client (
   $email_destination_domain = '',
   $email_notify_old_backup_days = false,
   $hosts_file_dhcp       = 0,
+  $hosts_file_user       = 'backuppc',
   $hosts_file_more_users = '',
   $sudo_prepend = '',
     ) {
@@ -432,15 +434,27 @@ class backuppc::client (
     }
   }
 
-  @@file_line { "backuppc_host_${::fqdn}":
-    ensure => $ensure,
-    path   => $backuppc::params::hosts,
-    match  => "^${::fqdn}.*$",
-    line   => "${::fqdn} ${hosts_file_dhcp} backuppc ${hosts_file_more_users}\t#puppetmanaged",
-    tag    => "backuppc_hosts_${backuppc_hostname}",
+  if $ensure == 'present' {
+    @@augeas { "backuppc_host_${config_name}-create":
+      context => '/files/etc/backuppc/hosts',
+      changes => template("${module_name}/host-augeas-create.erb"),
+      lens    => 'BackupPCHosts.lns',
+      incl    => '/etc/backuppc/hosts',
+      onlyif  => "match *[host = '${config_name}'] size == 0",
+      before  => Augeas["backuppc_host_${config_name}-update"],
+      tag     => "backuppc_hosts_${backuppc_hostname}",
+    }
+    @@augeas { "backuppc_host_${config_name}-update":
+      context => '/files/etc/backuppc/hosts',
+      changes => template("${module_name}/host-augeas-update.erb"),
+      lens    => 'BackupPCHosts.lns',
+      incl    => '/etc/backuppc/hosts',
+      onlyif  => "match *[host = '${config_name}'] size > 0",
+      tag     => "backuppc_hosts_${backuppc_hostname}",
+    }
   }
 
-  @@file { "${backuppc::params::config_directory}/pc/${::fqdn}.pl":
+  @@file { "${backuppc::params::config_directory}/pc/${config_name}.pl":
     ensure  => $ensure,
     content => template("${module_name}/host.pl.erb"),
     owner   => 'backuppc',
