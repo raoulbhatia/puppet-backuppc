@@ -418,10 +418,21 @@ class backuppc::server (
     }
   }
 
-  exec { 'backuppc-ssh-keygen':
+  exec { 'backuppc-ssh-keygen-rsa':
     command => "ssh-keygen -f ${real_topdir}/.ssh/id_rsa -C 'BackupPC on ${::fqdn}' -N ''",
     user    => 'backuppc',
     unless  => "test -f ${real_topdir}/.ssh/id_rsa",
+    path    => ['/usr/bin','/bin'],
+    require => [
+        Package[$backuppc::params::package],
+        File["${real_topdir}/.ssh"],
+    ],
+  }
+
+  exec { 'backuppc-ssh-keygen-ed25519':
+    command => "ssh-keygen -f ${real_topdir}/.ssh/id_ed25519 -C 'BackupPC on ${::fqdn}' -N '' -t ed25519",
+    user    => 'backuppc',
+    unless  => "test -f ${real_topdir}/.ssh/id_ed25519",
     path    => ['/usr/bin','/bin'],
     require => [
         Package[$backuppc::params::package],
