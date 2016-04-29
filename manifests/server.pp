@@ -456,10 +456,10 @@ class backuppc::server (
 
   # Export backuppc's authorized key to all clients
   # TODO don't rely on facter to obtain the ssh key.
-  if ! empty($::backuppc_pubkey_rsa) {
+  if ! empty($::backuppc_pubkey_ed25519) {
     @@ssh_authorized_key { "backuppc_${::fqdn}":
       ensure  => present,
-      key     => $::backuppc_pubkey_rsa,
+      key     => $::backuppc_pubkey_ed25519,
       name    => "backuppc_${::fqdn}",
       user    => 'backup',
       options => [
@@ -469,7 +469,7 @@ class backuppc::server (
         'no-pty',
         'no-X11-forwarding',
       ],
-      type    => 'ssh-rsa',
+      type    => 'ssh-ed25519',
       tag     => "backuppc_${::fqdn}",
     }
   }
@@ -497,5 +497,5 @@ class backuppc::server (
     require => [Package[$backuppc::params::package],Exec['tidy_hosts_file']],
   }
 
-  Sshkey <<| tag == "backuppc_sshkeys_${::fqdn}" |>>
+  Sshkey <<| tag == "backuppc_sshkeys_${::fqdn}_ed25519" |>>
 }

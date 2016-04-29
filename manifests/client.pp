@@ -417,8 +417,8 @@ class backuppc::client (
   if $::fqdn != $backuppc_hostname {
     @@sshkey { $::fqdn:
       ensure => $ensure,
-      type   => 'ssh-rsa',
-      key    => $::sshrsakey,
+      type   => 'ssh-ed25519',
+      key    => $::sshed25519,
       tag    => "backuppc_sshkeys_${backuppc_hostname}",
     }
   }
