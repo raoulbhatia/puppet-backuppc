@@ -48,6 +48,9 @@
 #   Example:
 #       $Conf{CgiImageDirURL} = '/BackupPC';
 #
+# [*cgi_date_format_mmdd*]
+#   Date display format for CGI interface. A value of 1 uses US-style dates (MM/DD), a value of 2 uses full YYYY-MM-DD format, and zero for international dates (DD/MM).
+#
 # [*max_user_backups*]
 # Additional number of simultaneous backups that users
 # can run. As many as $Conf{MaxBackups} + $Conf{MaxUserBackups}
@@ -249,6 +252,7 @@ class backuppc::server (
   $cgi_image_dir_url          = $backuppc::params::cgi_image_dir_url,
   $cgi_admin_users            = 'backuppc',
   $cgi_admin_user_group       = 'backuppc',
+  $cgi_date_format_mmdd       = 1,
   $user_cmd_check_status      =  true,
 ) inherits backuppc::params  {
 
@@ -332,6 +336,9 @@ class backuppc::server (
   validate_string($language)
   validate_string($cgi_admin_user_group)
   validate_string($cgi_admin_users)
+
+  validate_re("${cgi_date_format_mmdd}", '^[012]$',
+  'Cgi_date_format_mmdd paramter should be 0-2')
 
   $real_incr_fill = bool2num($incr_fill)
   $real_bzfif     = bool2num($blackout_zero_files_is_fatal)
