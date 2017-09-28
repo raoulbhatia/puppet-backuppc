@@ -358,6 +358,8 @@ class backuppc::client (
     if ! empty($system_additional_commands) {
       $additional_sudo_commands = join($system_additional_commands, ', ')
       $sudo_commands = $additional_sudo_commands
+    } else {
+      $sudo_commands = undef
     }
 
     if ! empty($system_additional_commands_noexec) {
@@ -367,7 +369,7 @@ class backuppc::client (
       $sudo_commands_noexec = $sudo_command_noexec
     }
 
-    if $facts['sudo_commands'] != undef {
+    if ! empty($sudo_commands) {
       file { '/etc/sudoers.d/backuppc':
         ensure  => $ensure,
         owner   => 'root',
