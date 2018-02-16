@@ -461,28 +461,16 @@ class backuppc::server (
     }
   }
 
-  # Since we now tag the hosts that are managed by
-  # puppet, check the current hosts file and compare
-  # it with what is in puppetdb.
-  $dbhosts = query_nodes("Class[backuppc::client]{backuppc_hostname=\"${::fqdn}\"}")
-  $hostsstr = join(sort($dbhosts), '')
-
-  exec { 'tidy_hosts_file':
-    command     => "sed -i '/#puppetmanaged$/d' ${backuppc::params::hosts}",
-    environment => ['LC_ALL=C'],
-    path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
-    unless      => "test \"$(sed -rn '/#puppetmanaged/ s/^([^ ]+).*/\\1/p' ${backuppc::params::hosts} | sort | tr -d '\\n')\" = \"${hostsstr}\"",
-  }
-
   # Hosts
   File <<| tag == "backuppc_config_${::fqdn}" |>> {
     group   => $backuppc::params::group_apache,
     notify  => Service[$backuppc::params::service],
     require => File["${backuppc::params::config_directory}/pc"],
   }
-  File_line <<| tag == "backuppc_hosts_${::fqdn}" |>> {
-    require => [Package[$backuppc::params::package],Exec['tidy_hosts_file']],
+
+  Augeas <<| tag == "backuppc_hosts_${::fqdn}" |>> {
     notify  => Service[$backuppc::params::service],
+    require => Package[$backuppc::params::package],
   }
 
   Sshkey <<| tag == "backuppc_sshkeys_${::fqdn}" |>>
