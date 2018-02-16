@@ -274,68 +274,32 @@ class backuppc::server (
   validate_re($ensure, '^(present|absent)$',
   'ensure parameter must have a value of: present or absent')
 
-  validate_re("${max_backups}", '^[1-9]([0-9]*)?$',
-  'Max_backups parameter should be a number')
+  validate_integer($max_backups)
+  validate_integer($max_user_backups)
+  validate_integer($max_pending_cmds)
+  validate_integer($max_backup_pc_nightly_jobs)
+  validate_integer($df_max_usage_pct)
+  validate_integer($max_old_log_files)
+  validate_integer($backup_pc_nightly_period)
+  validate_integer($trash_clean_sleep_sec)
 
-  validate_re("${max_user_backups}", '^[1-9]([0-9]*)?$',
-  'Max_user_backups parameter should be a number')
+  validate_numeric($full_period)
+  validate_numeric($incr_period)
 
-  validate_re("${max_pending_cmds}", '^[1-9]([0-9]*)?$',
-  'Max_pending_cmds parameter should be a number')
+  validate_integer($full_age_max)
+  validate_integer($incr_keep_cnt)
+  validate_integer($incr_age_max)
+  validate_integer($partial_age_max)
+  validate_integer($restore_info_keep_cnt)
+  validate_integer($archive_info_keep_cnt)
+  validate_integer($blackout_good_cnt)
 
-  validate_re("${max_backup_pc_nightly_jobs}", '^[1-9]([0-9]*)?$',
-  'Max_backup_pc_nightly_jobs parameter should be a number')
+  validate_numeric($email_notify_min_days)
 
-  validate_re("${df_max_usage_pct}", '^[1-9]([0-9]*)?$',
-  'Df_max_usage_pct parameter should be a number')
+  validate_integer($email_notify_old_backup_days)
+  validate_integer($cgi_date_format_mmdd, 2, 0)
 
-  validate_re("${max_old_log_files}", '^[1-9]([0-9]*)?$',
-  'Max_old_log_files parameter should be a number')
-
-  validate_re("${backup_pc_nightly_period}", '^[1-9]([0-9]*)?$',
-  'Backup_pc_nightly_period parameter should be a number')
-
-  validate_re("${trash_clean_sleep_sec}",  '^[1-9]([0-9]*)?$',
-  'Trash_clean_sleep_sec parameter should be a number')
-
-  validate_re("${full_period}", '^[0-9]([0-9]*)?(\.[0-9]{1,2})?$',
-  'Full_period parameter should be a number')
-
-  validate_re("${incr_period}", '^[0-9]([0-9]*)?(\.[0-9]{1,2})?$',
-  'Incr_period parameter should be a number')
-
-  validate_re("${full_age_max}", '^[1-9]([0-9]*)?$',
-  'Full_age_max parameter should be a number')
-
-  validate_re("${incr_keep_cnt}", '^[1-9]([0-9]*)?$',
-  'Incr_keep_cnt parameter should be a number')
-
-  validate_re("${incr_age_max}", '^[1-9]([0-9]*)?$',
-  'Incr_age_max parameter should be a number')
-
-  validate_re("${partial_age_max}", '^[1-9]([0-9]*)?$',
-  'Partial_age_max parameter should be a number')
-
-  validate_re("${restore_info_keep_cnt}", '^[1-9]([0-9]*)?$',
-  'Restore_info_keep_cnt parameter should be a number')
-
-  validate_re("${archive_info_keep_cnt}", '^[1-9]([0-9]*)?$',
-  'Restore_info_keep_cnt parameter should be a number')
-
-  validate_re("${blackout_good_cnt}", '^[1-9]([0-9]*)?$',
-  'Blackout_good_cnt parameter should be a number')
-
-  validate_re("${email_notify_min_days}", '^[0-9]([0-9]*)?(\.[0-9]{1,2})?$',
-  'Email_notify_min_days parameter should be a number')
-
-  validate_re("${email_notify_old_backup_days}", '^[1-9]([0-9]*)?$',
-  'Blackout_good_cnt parameter should be a number')
-
-  validate_re("${cgi_date_format_mmdd}", '^[012]$',
-  'Cgi_date_format_mmdd parameter should be 0-2')
-
-  validate_re("${pingmaxmsec}", '^[1-9]([0-9]*)?$',
-  'pingmaxmsec parameter should be a number')
+  validate_integer($pingmaxmsec)
 
   validate_array($wakeup_schedule)
   validate_array($dhcp_address_ranges)
