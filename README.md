@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/wyrie/puppet-backuppc.png?branch=master)](http://travis-ci.org/wyrie/puppet-backuppc)
 
-####Table of Contents
+#### Table of Contents
 
 1. [Overview](#overview)
 2. [Module Description](#module-description)
@@ -11,14 +11,14 @@
 5. [Limitations](#limitations)
 6. [Development](#development)
 
-##Overview
+## Overview
 
 This module will install and configure a BackupPC server and allow you to add other puppet managed nodes as clients/hosts. It
 uses exported resources to create the client's configuration file, add it to the hosts file and setup ssh access if needed.
 
 This module started as a fork of https://github.com/codec/puppet-backuppc.
 
-##Module Description
+## Module Description
 
 BackupPC has many configuration options and this module should provide you access to most of them. BackupPC's global configuration
 file is managed by backuppc::server and is intended to setup useful defaults that can be overridden by the client if needed.

@@ -326,7 +326,7 @@ class backuppc::server (
   }
 
   # On Debian, adapt log_directory to $topdir value
-  $real_log_directory = $::osfamily ? {
+  $real_log_directory = $facts['os']['family'] ? {
     'Debian' => "${topdir}/log",
     default  => $backuppc::params::log_directory,
   }
@@ -344,7 +344,7 @@ class backuppc::server (
   Package[$backuppc::params::package] -> File[$backuppc::params::config] -> Service[$backuppc::params::service]
 
   # Include preseeding for debian packages
-  if $::osfamily == 'Debian' {
+  if $facts['os']['family'] == 'Debian' {
     file { '/var/cache/debconf/backuppc.seeds':
       ensure => $ensure,
       source => 'puppet:///modules/backuppc/backuppc.preseed',
@@ -397,7 +397,7 @@ class backuppc::server (
   # Workaround for client exported resources that are
   # on a different osfamily. Maintain a symlink to alternative
   # config directory targets.
-  case $::osfamily {
+  case $facts['os']['family'] {
     'Debian': {
       file { '/etc/BackupPC':
         ensure => link,
@@ -411,13 +411,13 @@ class backuppc::server (
       }
     }
     default: {
-      notify { "If you've added support for ${::operatingsystem} you'll need to extend this case statement to.":
+      notify { "If you've added support for ${facts['os']['name']} you'll need to extend this case statement to.":
       }
     }
   }
 
   exec { 'backuppc-ssh-keygen':
-    command => "ssh-keygen -f ${real_topdir}/.ssh/id_rsa -C 'BackupPC on ${::fqdn}' -N ''",
+    command => "ssh-keygen -f ${real_topdir}/.ssh/id_rsa -C 'BackupPC on ${facts['networking']['fqdn']}' -N ''",
     user    => 'backuppc',
     unless  => "test -f ${real_topdir}/.ssh/id_rsa",
     path    => ['/usr/bin','/bin'],
@@ -431,7 +431,7 @@ class backuppc::server (
   if $apache_configuration {
     file { $backuppc::params::config_apache:
       ensure  => $ensure,
-      content => template("backuppc/apache_${::osfamily}.erb"),
+      content => template("backuppc/apache_${facts['os']['family']}.erb"),
       require => Package[$backuppc::params::package],
     }
 
@@ -444,10 +444,10 @@ class backuppc::server (
   # Export backuppc's authorized key to all clients
   # TODO don't rely on facter to obtain the ssh key.
   if $facts['backuppc_pubkey_rsa'] != undef {
-    @@ssh_authorized_key { "backuppc_${::fqdn}":
+    @@ssh_authorized_key { "backuppc_${facts['networking']['fqdn']}":
       ensure  => present,
-      key     => $::backuppc_pubkey_rsa,
-      name    => "backuppc_${::fqdn}",
+      key     => $facts['backuppc_pubkey_rsa'],
+      name    => "backuppc_${facts['networking']['fqdn']}",
       user    => 'backup',
       options => [
         'command="~/backuppc.sh"',
@@ -457,21 +457,21 @@ class backuppc::server (
         'no-X11-forwarding',
       ],
       type    => 'ssh-rsa',
-      tag     => "backuppc_${::fqdn}",
+      tag     => "backuppc_${facts['networking']['fqdn']}",
     }
   }
 
   # Hosts
-  File <<| tag == "backuppc_config_${::fqdn}" |>> {
+  File <<| tag == "backuppc_config_${facts['networking']['fqdn']}" |>> {
     group   => $backuppc::params::group_apache,
     notify  => Service[$backuppc::params::service],
     require => File["${backuppc::params::config_directory}/pc"],
   }
 
-  Augeas <<| tag == "backuppc_hosts_${::fqdn}" |>> {
+  Augeas <<| tag == "backuppc_hosts_${facts['networking']['fqdn']}" |>> {
     notify  => Service[$backuppc::params::service],
     require => Package[$backuppc::params::package],
   }
 
-  Sshkey <<| tag == "backuppc_sshkeys_${::fqdn}" |>>
+  Sshkey <<| tag == "backuppc_sshkeys_${facts['networking']['fqdn']}" |>>
 }

@@ -7,7 +7,7 @@
 # Scott Barr <gsbarr@gmail.com>
 #
 class backuppc::params {
-  case $::osfamily {
+  case $facts['os']['family'] {
     'Debian': {
       $package            = 'backuppc'
       $service            = 'backuppc'
@@ -20,7 +20,7 @@ class backuppc::params {
       $cgi_image_dir      = "${install_directory}/image"
       $cgi_image_dir_url  = '/backuppc/image'
       $log_directory      = '/var/lib/backuppc/log'
-      if ($::operatingsystemmajrelease == 6) {
+      if ($facts['os']['release']['major'] == 6) {
         $config_apache      = '/etc/backuppc/apache.conf'
       } else {
         $config_apache      = '/etc/apache2/conf.d/backuppc.conf'
@@ -51,7 +51,7 @@ class backuppc::params {
       $tar_path           = '/bin/gtar'
     }
     default: {
-      fail("Operating system ${::operatingsystem} is not supported by this module")
+      fail("Operating system ${facts['os']['name']} is not supported by this module")
     }
   }
 

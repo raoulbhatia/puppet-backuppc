@@ -226,7 +226,7 @@
 #
 class backuppc::client (
   $ensure                = 'present',
-  $config_name           = $::fqdn,
+  $config_name           = $facts['networking']['fqdn'],
   $backuppc_hostname     = '',
   $client_name_alias     = false,
   $system_account        = 'backup',
@@ -425,11 +425,11 @@ class backuppc::client (
     }
   }
 
-  if $::fqdn != $backuppc_hostname {
-    @@sshkey { $::fqdn:
+  if $facts['networking']['fqdn'] != $backuppc_hostname {
+    @@sshkey { $facts['networking']['fqdn']:
       ensure => $ensure,
       type   => 'ssh-rsa',
-      key    => $::sshrsakey,
+      key    => $facts['ssh']['rsa']['key'],
       tag    => "backuppc_sshkeys_${backuppc_hostname}",
     }
   }
