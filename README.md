@@ -104,26 +104,16 @@ class { 'backuppc::client':
 Debian by default installs a 'localhost' host, but if you want to managed it with puppet or if you're on Centos/RHEL this example will use the tar method to backup
 the paths you sepcify. The example uses sudo which is not configured in the module itself.
 
-##Reference
+## Reference
 
-###Classes
+### Classes
 
-####Public Classes
+#### Public Classes
 
 * backuppc:server: Class used to install backuppc.
 * backuppc::client: Configures host for backup through backuppc.
 
-####Private Classes
+#### Private Classes
 
 * backuppc::params: Default values.
-
-## Limitations
-
-* This module has been tested on Debian Wheezy, Squeeze and Centos 6.4.
-* Storeconfigs need to be enabled for this module to work.
-* There is a TODO for generating and installing the server's ssh key. Currently it relies on a facter value that is only present on the second run of puppet.
-
-## Contributors
-* [txaj](https://github.com/txaj)
-* [solarkennedy](https://github.com/solarkennedy)
 
