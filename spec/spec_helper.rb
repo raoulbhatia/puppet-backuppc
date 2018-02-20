@@ -4,13 +4,11 @@ include RspecPuppetFacts
 
 if Dir.exist?(File.expand_path('../../lib', __FILE__))
   require 'coveralls'
-  Coveralls.wear! { add_filter "/spec/" }
-
   require 'simplecov'
   require 'simplecov-console'
   SimpleCov.formatters = [
     SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::Console
+    SimpleCov::Formatter::Console,
   ]
   SimpleCov.start do
     track_files 'lib/**/*.rb'
