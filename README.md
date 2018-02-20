@@ -1,6 +1,10 @@
 # BackupPC Module
 
 [![Build Status](https://secure.travis-ci.org/wyrie/puppet-backuppc.png?branch=master)](http://travis-ci.org/wyrie/puppet-backuppc)
+[![Code Coverage](https://coveralls.io/repos/github/wyrie/puppet-backuppc/badge.svg?branch=master)](https://coveralls.io/github/wyrie/puppet-backuppc)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/wyrie/backuppc.svg)](https://forge.puppetlabs.com/wyrie/backuppc)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/wyrie/backuppc.svg)](https://forge.puppetlabs.com/wyrie/backuppc)
+[![Puppet Forge - scores](https://img.shields.io/puppetforge/f/wyrie/backuppc.svg)](https://forge.puppetlabs.com/wyrie/backuppc)
 
 #### Table of Contents
 
@@ -8,8 +12,6 @@
 2. [Module Description](#module-description)
 3. [Usage](#usage)
 4. [Reference](#reference)
-5. [Limitations](#limitations)
-6. [Development](#development)
 
 ## Overview
 
