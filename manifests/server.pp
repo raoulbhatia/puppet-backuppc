@@ -325,6 +325,11 @@ class backuppc::server (
     default => $topdir,
   }
 
+  $directory_ensure = $ensure ? {
+    'present' => 'directory',
+    default => 'absent',
+  }
+
   # On Debian, adapt log_directory to $topdir value
   $real_log_directory = $facts['os']['family'] ? {
     'Debian' => "${topdir}/log",
@@ -373,7 +378,7 @@ class backuppc::server (
   }
 
   file { $backuppc::params::config_directory:
-    ensure  => $ensure,
+    ensure  => $directory_ensure,
     owner   => 'backuppc',
     group   => $backuppc::params::group_apache,
     require => Package[$backuppc::params::package],
