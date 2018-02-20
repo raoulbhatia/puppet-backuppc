@@ -25,7 +25,6 @@ minor_version = ruby_version_segments[0..1].join('.')
 
 group :test do
   gem 'coveralls',                                                  require: false
-  gem 'simplecov-console',                                          require: false
 end
 
 group :development do
