@@ -38,7 +38,7 @@ define backuppc::server::user (
   $real_password = inline_template("{SHA}<%= Base64.encode64(Digest::SHA1.digest('${password}')).chomp! %>")
 
   Exec {
-    require => Package[$backuppc::params::package],
+    require => Package['backuppc'],
     path    => ['/usr/bin', '/bin'],
   }
 

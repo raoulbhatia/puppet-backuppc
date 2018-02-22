@@ -346,7 +346,7 @@ class backuppc::server (
   }
 
   # Set up dependencies
-  Package[$backuppc::params::package] -> File[$backuppc::params::config] -> Service[$backuppc::params::service]
+  Package['backuppc'] -> File['config.pl'] -> Service['backuppc']
 
   # Include preseeding for debian packages
   if $facts['os']['family'] == 'Debian' {
@@ -357,46 +357,62 @@ class backuppc::server (
   }
 
   # BackupPC package and service configuration
-  package { $backuppc::params::package:
-    ensure  => $ensure,
+  package { 'backuppc':
+    ensure => $ensure,
+    name   => $backuppc::params::package,
   }
 
-  service { $backuppc::params::service:
+  service { 'backuppc':
     ensure    => $service_enable,
+    name      => $backuppc::params::service,
     enable    => $service_enable,
     hasstatus => true,
     pattern   => 'BackupPC'
   }
 
-  file { $backuppc::params::config:
+  file { 'config.pl':
     ensure  => $ensure,
+    path    => $backuppc::params::config,
     owner   => 'backuppc',
     group   => $backuppc::params::group_apache,
     mode    => '0640',
     content => template('backuppc/config.pl.erb'),
-    notify  => Service[$backuppc::params::service]
+    notify  => Service['backuppc']
   }
 
-  file { $backuppc::params::config_directory:
+  file { 'config_directory':
+    ensure  => $directory_ensure,
+    path    => $backuppc::params::config_directory,
+    owner   => 'backuppc',
+    group   => $backuppc::params::group_apache,
+    require => Package['backuppc'],
+  }
+
+  file { 'pc_directory_symlink':
+    ensure  => link,
+    path    => "${backuppc::params::config_directory}/pc",
+    target  => $backuppc::params::config_directory,
+    require => Package['backuppc'],
+  }
+
+  $topdir_defaults = {
     ensure  => $directory_ensure,
     owner   => 'backuppc',
     group   => $backuppc::params::group_apache,
-    require => Package[$backuppc::params::package],
-  }
-
-  file { "${backuppc::params::config_directory}/pc":
-    ensure  => link,
-    target  => $backuppc::params::config_directory,
-    require => Package[$backuppc::params::package],
-  }
-
-  file { [$real_topdir, "${real_topdir}/.ssh"]:
-    ensure  => 'directory',
-    owner   => 'backuppc',
-    group   => $backuppc::params::group_apache,
     mode    => '0640',
-    require => Package[$backuppc::params::package],
-    ignore  => 'BackupPC.sock',
+    require => Package['backuppc'],
+  }
+
+  file {
+    default:
+      * => $topdir_defaults,;
+
+    'topdir':
+      path   => $real_topdir,
+      ignore => 'BackupPC.sock',;
+
+    'topdir_ssh':
+      path => "${real_topdir}/.ssh",;
   }
 
   # Workaround for client exported resources that are
@@ -427,17 +443,18 @@ class backuppc::server (
     unless  => "test -f ${real_topdir}/.ssh/id_rsa",
     path    => ['/usr/bin','/bin'],
     require => [
-        Package[$backuppc::params::package],
+        Package['backuppc'],
         File["${real_topdir}/.ssh"],
     ],
   }
 
   # BackupPC apache configuration
   if $apache_configuration {
-    file { $backuppc::params::config_apache:
+    file { 'apache_config':
       ensure  => $ensure,
+      path    => $backuppc::params::config_apache,
       content => template("backuppc/apache_${facts['os']['family']}.erb"),
-      require => Package[$backuppc::params::package],
+      require => Package['backuppc'],
     }
 
     # Create the default admin account
@@ -469,13 +486,13 @@ class backuppc::server (
   # Hosts
   File <<| tag == "backuppc_config_${facts['networking']['fqdn']}" |>> {
     group   => $backuppc::params::group_apache,
-    notify  => Service[$backuppc::params::service],
-    require => File["${backuppc::params::config_directory}/pc"],
+    notify  => Service['backuppc'],
+    require => File['pc_directory_symlink'],
   }
 
   Augeas <<| tag == "backuppc_hosts_${facts['networking']['fqdn']}" |>> {
-    notify  => Service[$backuppc::params::service],
-    require => Package[$backuppc::params::package],
+    notify  => Service['backuppc'],
+    require => Package['backuppc'],
   }
 
   Sshkey <<| tag == "backuppc_sshkeys_${facts['networking']['fqdn']}" |>>
