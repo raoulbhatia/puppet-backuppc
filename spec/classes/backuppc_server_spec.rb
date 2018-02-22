@@ -13,9 +13,31 @@ describe 'backuppc::server' do
       let(:params) { { 'backuppc_password' => 'test_password' } }
 
       options = os_specific_options(facts)
-      it { is_expected.to contain_class('backuppc::params') }
-      it { is_expected.to contain_package(options[:package]) }
-      it { is_expected.to compile.with_all_deps }
+      context 'with defaults' do
+        it { is_expected.to contain_class('backuppc::server') }
+        it { is_expected.to contain_class('backuppc::params') }
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_package('backuppc') }
+        it do
+          is_expected.to contain_file('config_directory').with(
+            ensure: 'directory',
+            group: options[:group_apache],
+          )
+        end
+        it do
+          is_expected.to contain_file('config.pl').with(
+            ensure: 'present',
+            group: options[:group_apache],
+            mode: '0640',
+          )
+        end
+        it { is_expected.to contain_file('pc_directory_symlink').with_ensure('link') }
+        it { is_expected.to contain_service('backuppc').with_ensure(true) }
+        it { is_expected.to contain_file('topdir').with_ensure('directory') }
+        it { is_expected.to contain_file('topdir_ssh').with_ensure('directory') }
+        it { is_expected.to contain_file('apache_config').with_ensure('present') }
+        it { is_expected.to contain_backuppc__server__user('backuppc').with_password('test_password') }
+      end
     end
   end
 end

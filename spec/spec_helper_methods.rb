@@ -1,8 +1,8 @@
 def os_specific_options(facts)
   case facts[:os]['family']
   when 'RedHat'
-    { package: 'BackupPC', service: 'backuppc', topdir: '/var/lib/BackupPC' }
+    { group_apache: 'apache', topdir: '/var/lib/BackupPC' }
   when 'Debian'
-    { package: 'backuppc', service: 'backuppc', topdir: '/var/lib/backuppc' }
+    { group_apache: 'www-data', topdir: '/var/lib/backuppc' }
   end
 end
