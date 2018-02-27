@@ -63,7 +63,7 @@
 # jobs. This limit is to make sure BackupPC doesn't fall too far
 # behind in running BackupPC_link commands.
 #
-# [*max_backup_pc_nightly_jobs*]
+# [*max_backuppc_nightly_jobs*]
 # How many BackupPC_nightly processes to run in parallel. Each night,
 # at the first wakeup listed in $Conf{WakeupSchedule}, BackupPC_nightly
 # is run. Its job is to remove unneeded files in the pool, ie: files that
@@ -71,7 +71,7 @@
 # cannot run at the same time. Starting in v3.0.0, BackupPC_nightly can run
 # concurrently with backups (BackupPC_dump).
 #
-# [*backup_pc_nightly_period*]
+# [*backuppc_nightly_period*]
 # How many days (runs) it takes BackupPC_nightly to traverse the entire pool.
 # Normally this is 1, which means every night it runs, it does traverse the entire
 # pool removing unused pool files.
@@ -221,8 +221,8 @@ class backuppc::server (
   $max_user_backups           = 4,
   $language                   = 'en',
   $max_pending_cmds           = 15,
-  $max_backup_pc_nightly_jobs = 2,
-  $backup_pc_nightly_period   = 1,
+  $max_backuppc_nightly_jobs = 2,
+  $backuppc_nightly_period   = 1,
   $max_old_log_files          = 14,
   $df_max_usage_pct           = 95,
   $trash_clean_sleep_sec      = 300,
@@ -277,10 +277,10 @@ class backuppc::server (
   validate_integer($max_backups)
   validate_integer($max_user_backups)
   validate_integer($max_pending_cmds)
-  validate_integer($max_backup_pc_nightly_jobs)
+  validate_integer($max_backuppc_nightly_jobs)
   validate_integer($df_max_usage_pct)
   validate_integer($max_old_log_files)
-  validate_integer($backup_pc_nightly_period)
+  validate_integer($backuppc_nightly_period)
   validate_integer($trash_clean_sleep_sec)
 
   validate_numeric($full_period)
