@@ -195,7 +195,7 @@ $Conf{RestorePreUserCmd}  = undef;
 $Conf{RestorePostUserCmd} = undef;
 $Conf{ArchivePreUserCmd}  = undef;
 $Conf{ArchivePostUserCmd} = undef;
-$Conf{UserCmdCheckStatus} = <% if @real_uccs -%>'<%= @real_uccs %>'<% end %>;
+$Conf{UserCmdCheckStatus} = <%= @real_uccs %>;
 $Conf{ClientNameAlias} = undef;
 $Conf{SendmailPath} = '/usr/sbin/sendmail';
 $Conf{EMailNotifyMinDays} = <%= @email_notify_min_days %>;
