@@ -215,7 +215,7 @@ $Conf{EMailHeaders} = <<EOF;
 <%= header %>: <%= value %>
 <% end -%>
 EOF
-$Conf{CgiAdminUserGroup} = 'backuppc';
+$Conf{CgiAdminUserGroup} = '<%= @cgi_admin_user_group %>';
 $Conf{CgiAdminUsers}     = '<%= @cgi_admin_users %>';
 $Conf{CgiURL} = '<%= @cgi_url %>';
 $Conf{Language} = '<%= @language %>';
