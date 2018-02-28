@@ -153,7 +153,7 @@
 # pings is maintained. Once a PC has at least $Conf{BlackoutGoodCnt} consecutive good pings
 # it is subject to "blackout" and not backed up during hours and days specified by $Conf{BlackoutPeriods}.
 #
-# [*blackout_zero_files_is_fatal*]
+# [*backup_zero_files_is_fatal*]
 # Boolean. A backup of a share that has zero files is considered fatal. This is used to catch miscellaneous Xfer
 # errors that result in no files being backed up. If you have shares that might be
 # empty (and therefore an empty backup is valid) you should set this to false.
@@ -168,7 +168,7 @@
 # [*email_admin_user_name*]
 # Destination address to an administrative user who will receive a nightly email with warnings and errors.
 #
-# [*email_destination_domain*]
+# [*email_user_dest_domain*]
 # Destination domain name for email sent to users.
 #
 # [*email_notify_old_backup_days*]
@@ -202,7 +202,7 @@
 # [*topdir*]
 # Overwrite package default location for backuppc.
 #
-# [*pingmaxmsec*]
+# [*ping_max_msec*]
 # Maximum RTT value (in ms) above which backup won't be started. Default to 20ms
 #
 # === Examples
@@ -244,11 +244,11 @@ class backuppc::server (
                                     hourEnd   => 19.5,
                                     weekDays  => [1, 2, 3, 4, 5],
                                 }, ],
-  $blackout_zero_files_is_fatal = true,
+  $backup_zero_files_is_fatal = true,
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',
   $email_admin_user_name      = 'backuppc',
-  $email_destination_domain   = '',
+  $email_user_dest_domain     = '',
   $email_notify_old_backup_days = 7,
   $email_headers              = { 'MIME-Version' => 1.0,
                                   'Content-Type' => 'text/plain; charset="iso-8859-1"', },
@@ -262,7 +262,7 @@ class backuppc::server (
   $cgi_admin_user_group       = 'backuppc',
   $cgi_date_format_mmdd       = 1,
   $user_cmd_check_status      = true,
-  $pingmaxmsec                = 20
+  $ping_max_msec                = 20
 ) inherits backuppc::params  {
 
   if empty($backuppc_password) {
@@ -299,7 +299,7 @@ class backuppc::server (
   validate_integer($email_notify_old_backup_days)
   validate_integer($cgi_date_format_mmdd, 2, 0)
 
-  validate_integer($pingmaxmsec)
+  validate_integer($ping_max_msec)
 
   validate_array($wakeup_schedule)
   validate_array($dhcp_address_ranges)
@@ -317,7 +317,7 @@ class backuppc::server (
   validate_string($cgi_admin_users)
 
   $real_incr_fill = bool2num($incr_fill)
-  $real_bzfif     = bool2num($blackout_zero_files_is_fatal)
+  $real_bzfif     = bool2num($backup_zero_files_is_fatal)
   $real_uccs      = bool2num($user_cmd_check_status)
 
   $real_topdir = $topdir ? {
