@@ -1,28 +1,20 @@
-# == Define: backuppc::server::user
+# @summary
+#   Add user credentials to the backuppc htpasswd file.
 #
-# Add user credentials to the backuppc htpasswd file.
+# @param ensure
+#   Present or absent
 #
-# === Parameters
+# @param username
+#   Namevar. Defaults to the title if no value is provided.
 #
-# [*ensure*]
-# Present or absent
-#
-# [*username*]
-# Namevar. Defaults to the title if no value is provided.
-#
-# [*password*]
-# Password for the account. Will be converted to a sha encrypted password.
-#
-# === Authors
-#
-# Scott Barr <gsbarr@gmail.com>
+# @param password
+#   Password for the account. Will be converted to a sha encrypted password.
 #
 define backuppc::server::user (
   $ensure   = 'present',
   $username = undef,
   $password = '',
 ) {
-  include backuppc::params
 
   validate_re($ensure, '^(present|absent)$',
   'ensure parameter must have a value of: present or absent')
@@ -43,12 +35,18 @@ define backuppc::server::user (
   }
 
   if $ensure == 'present' {
-    exec {"test -f ${backuppc::params::htpasswd_apache} || OPT='-c'; htpasswd -bs \${OPT} ${backuppc::params::htpasswd_apache} ${real_username} '${password}'":
-      unless  => "grep -q ${real_username}:${real_password} ${backuppc::params::htpasswd_apache}",
+    $command = @("END"/$L)
+      test -f ${backuppc::server::htpasswd_apache} \
+        || OPT='-c';\
+      htpasswd -bs \${OPT} \
+        ${backuppc::server::htpasswd_apache} ${real_username} '${password}'
+      | - END
+    exec {$command:
+      unless  => "grep -q ${real_username}:${real_password} ${backuppc::server::htpasswd_apache}",
     }
   } else {
-    exec {"htpasswd -D ${backuppc::params::htpasswd_apache} ${real_username}":
-      onlyif  => "egrep -q '^${real_username}:' ${backuppc::params::htpasswd_apache}",
+    exec {"htpasswd -D ${backuppc::server::htpasswd_apache} ${real_username}":
+      onlyif  => "egrep -q '^${real_username}:' ${backuppc::server::htpasswd_apache}",
     }
   }
 }

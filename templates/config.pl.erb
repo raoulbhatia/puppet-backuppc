@@ -21,27 +21,19 @@ $Conf{MaxOldLogFiles} = <%= @max_old_log_files %>;
 $Conf{DfPath} = '/bin/df';
 $Conf{DfCmd} = '$dfPath $topDir';
 $Conf{SplitPath} = '/usr/bin/split';
-$Conf{ParPath}   = '<%= scope.lookupvar('backuppc::params::par_path') %>';
+$Conf{ParPath}   = '<%= @par_path  %>';
 $Conf{CatPath}   = '/bin/cat';
-$Conf{GzipPath}  = '<%= scope.lookupvar('backuppc::params::gzip_path') %>';
-$Conf{Bzip2Path} = '<%= scope.lookupvar('backuppc::params::bzip2_path') %>';
+$Conf{GzipPath}  = '<%= @gzip_path  %>';
+$Conf{Bzip2Path} = '<%= @bzip2_path  %>';
 $Conf{DfMaxUsagePct} = <%= @df_max_usage_pct %>;
 $Conf{TrashCleanSleepSec} = <%= @trash_clean_sleep_sec %>;
-$Conf{DHCPAddressRanges} = [
-<% @dhcp_address_ranges.each do |range| -%>
-<% if range.is_a?(Hash) -%>{
-<% range.each_pair do |key,value| -%>
-  <%= key %>  => <% if key == 'ipAddrBase' %>'<%= value %>'<% else %><%= value %><% end %>,
-<% end -%>
-},
-<% end -%>
-<% end -%>];
+$Conf{DHCPAddressRanges} =  <%= PP.pp(@dhcp_address_ranges,'').chomp.tr(?", ?') -%>;
 $Conf{BackupPCUser} = 'backuppc';
-$Conf{TopDir}      = '<%= scope.lookupvar('backuppc::server::real_topdir') %>';
-$Conf{ConfDir}     = '<%= scope.lookupvar('backuppc::params::config_directory') %>';
-$Conf{LogDir}      = '<%= scope.lookupvar('backuppc::server::real_log_directory') %>';
-$Conf{InstallDir}  = '<%= scope.lookupvar('backuppc::params::install_directory') %>';
-$Conf{CgiDir}      = '<%= scope.lookupvar('backuppc::params::cgi_directory') %>';
+$Conf{TopDir}      = '<%= scope['backuppc::server::real_topdir'] %>';
+$Conf{ConfDir}     = '<%= @config_directory  %>';
+$Conf{LogDir}      = '<%= scope['backuppc::server::real_log_directory'] %>';
+$Conf{InstallDir}  = '<%= @install_directory  %>';
+$Conf{CgiDir}      = '<%= @cgi_directory  %>';
 $Conf{BackupPCUserVerify} = 1;
 $Conf{HardLinkMax} = 31999;
 $Conf{PerlModuleLoad}     = undef;
@@ -49,7 +41,7 @@ $Conf{ServerInitdPath} = '';
 $Conf{ServerInitdStartCmd} = '';
 $Conf{FullPeriod} = <%= @full_period %>;
 $Conf{IncrPeriod} = <%= @incr_period %>;
-$Conf{FullKeepCnt} = <% if @full_keep_cnt.is_a?(Array) %>[<%= @full_keep_cnt.join(', ') %>]<% else %><%= @full_keep_cnt %><% end %>;
+$Conf{FullKeepCnt} = <%= PP.pp(@full_keep_cnt,'').chomp.tr(?", ?') -%>;
 $Conf{FullKeepCntMin} = 1;
 $Conf{FullAgeMax}     = <%= @full_age_max %>;
 $Conf{IncrKeepCnt} = <%= @incr_keep_cnt %>;
@@ -65,15 +57,9 @@ $Conf{BackupFilesOnly} = undef;
 $Conf{BackupFilesExclude} = undef;
 $Conf{BlackoutBadPingLimit} = 3;
 $Conf{BlackoutGoodCnt}      = <%= @blackout_good_cnt %>;
-$Conf{BlackoutPeriods} = [
-<% @blackout_periods.each do |period| -%>
-<% if period.is_a?(Hash) -%>{
-<% period.keys.sort.each do |key| -%>
-  <%= key %>  => <% if period[key].is_a?(Array) %>[<%= period[key].join(', ') %>]<% else %><%= period[key] %><% end %>,
+<% if defined?(@blackout_periods) -%>
+$Conf{BlackoutPeriods} = <%= PP.pp(@blackout_periods,'').chomp.tr(?", ?') -%>;
 <% end -%>
-},
-<% end -%>
-<% end -%>];
 $Conf{BackupZeroFilesIsFatal} = <%= @real_bzfif %>;
 $Conf{XferMethod} = 'rsync';
 $Conf{XferLogLevel} = 1;
@@ -101,8 +87,8 @@ $Conf{TarIncrArgs} = '--newer=$incrDate+ $fileList+';
 $Conf{TarClientRestoreCmd} = '$sshPath -q -x -l root $host'
        . ' env LC_ALL=C $tarPath -x -p --numeric-owner --same-owner'
        . ' -v -f - -C $shareName+';
-$Conf{TarClientPath} = '<%= scope.lookupvar('backuppc::params::tar_path') %>';
-$Conf{RsyncClientPath} = '/usr/bin/rsync';
+$Conf{TarClientPath} = '<%= @tar_path  %>';
+$Conf{RsyncClientPath} = '<%= @rsync_path  %>';
 $Conf{RsyncClientCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
 $Conf{RsyncClientRestoreCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
 $Conf{RsyncShareName} = '/';
@@ -137,6 +123,9 @@ $Conf{RsyncArgs} = [
       # Add additional arguments here
       #
 ];
+<% if defined?(@rsync_args_extra) and !@rsync_args_extra.empty? -%>
+$Conf{RsyncArgsExtra} = <%= PP.pp(@rsync_args_extra,'').chomp.tr(?", ?') -%>;
+<% end -%>
 $Conf{RsyncRestoreArgs} = [
       #
       # Do not edit these!
@@ -165,10 +154,6 @@ $Conf{RsyncRestoreArgs} = [
       # Add additional arguments here
       #
 ];
-$Conf{BackupPCdShareName} = '/';
-$Conf{BackupPCdPath} = '';
-$Conf{BackupPCdCmd} = '$bpcdPath $host $shareName $poolDir XXXX $poolCompress $topDir/pc/$client/new';
-$Conf{BackupPCdRestoreCmd} = '$bpcdPath TODO';
 $Conf{ArchiveDest} = '/tmp';
 $Conf{ArchiveComp} = 'gzip';
 $Conf{ArchivePar} = 0;
@@ -248,7 +233,7 @@ $Conf{CgiStatusHilightColor} = {
     Disabled_AllBackupsDisabled    => '#d1d1d1',
 };
 $Conf{CgiHeaders} = '<meta http-equiv="pragma" content="no-cache">';
-$Conf{CgiImageDir} = '<%= scope.lookupvar('backuppc::params::cgi_image_dir') %>';
+$Conf{CgiImageDir} = '<%= @cgi_image_dir  %>';
 $Conf{CgiExt2ContentType} = { };
 $Conf{CgiImageDirURL} = '<%= @cgi_image_dir_url %>';
 $Conf{CgiCSSFile} = 'BackupPC_stnd.css';
@@ -297,6 +282,7 @@ $Conf{CgiUserConfigEdit} = {
         RsyncdAuthRequired        => 1,
         RsyncCsumCacheVerifyProb  => 1,
         RsyncArgs                 => 1,
+        RsyncArgsExtra            => 1,
         RsyncRestoreArgs          => 1,
         RsyncClientCmd            => 0,
         RsyncClientRestoreCmd     => 0,
@@ -309,7 +295,7 @@ $Conf{CgiUserConfigEdit} = {
         FixedIPNetBiosNameCheck   => 1,
         NmbLookupCmd              => 0,
         NmbLookupFindHostCmd      => 0,
-        PingMaxMsec               => 20,
+        PingMaxMsec               => 1,
         PingCmd                   => 0,
         ClientTimeout             => 1,
         MaxOldPerPCLogFiles       => 1,
